@@ -29,6 +29,7 @@ public class ParallelExample {
 		time = endTime - startTime;
 		System.out.println("avg: " + avg + ", 일반 스트림 처리 시간: " + time + "ns");
 		
+	
 		Stream<Integer> parallelStream = scores.parallelStream();
 		startTime = System.nanoTime();
 		avg = parallelStream

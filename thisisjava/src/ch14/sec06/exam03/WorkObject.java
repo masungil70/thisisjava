@@ -18,6 +18,10 @@ public class WorkObject {
 		this.b = b;
 	}
 	
+	public void calc() {
+		result = a + b;
+	}
+	
 	public int getResult() {
 		return result;
 	}

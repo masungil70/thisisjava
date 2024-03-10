@@ -1,30 +1,37 @@
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Computer {
     public static void main(String[] args) {
-        String[] students = {"강연규", "김세현", "김혜진", "박경덕", "박상훈", "박시은", "박종성", "박주영", "백승찬", "안아영", "이민영", "이채은", "임소연", "정혜림", "조성희", "최정민", "황원재", "배자현"};
-
-//        Scanner sc = new Scanner(System.in);
-//
-//        for(int i = 0; i < students.length; ++i){
-//            String name = sc.next();
-//            students[i] = name;
-//        }
-
-        String[] result = new String[students.length];
-
-        for (int i = 0; i < result.length; ++i) {
-            int index = (int)(Math.random() * (students.length - i));
-            result[i] = students[index];
-
-            String temp = students[index];
-            students[index] = students[students.length - 1 - i];
-            students[students.length - 1 - i] = temp;
+        String[] students = {
+        		  "강연규"
+        		, "백승찬"
+        		, "김혜진"
+        		, "안아영"
+        		, "박경덕"
+        		, "안윤빈"
+        		, "박상준"
+        		, "박상훈"
+        		, "이민영"
+        		, "임소연"
+        		, "박시은"
+        		, "박종성"
+        		, "정혜림"
+        		, "조성희"
+        		, "최정민"
+        		, "배자현"};
+        
+        List<String> list = new ArrayList<>();
+        for (String name : students) {
+        	list.add(name);
         }
-
-        for(int i = 0; i< result.length; ++i){
-            System.out.println((i + 1) + "번 : " + result[i]);
+        Collections.shuffle(list);
+        
+        int i = 0;
+        for (String name : list) {
+        	System.out.println((i++ + 1) + "번 : " + name);
         }
     }
 }

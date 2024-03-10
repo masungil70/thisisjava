@@ -19,7 +19,11 @@ public class CalcThread extends Thread {
 			}
 		}
 		
+		//계산완료 
+		workObject.calc();
+		
 		synchronized(workObject) {
+			//workObject를 사용할 모든 대기 객체를 깨운다 
 			workObject.notifyAll();
 		}
 	}

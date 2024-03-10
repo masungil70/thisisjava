@@ -49,6 +49,7 @@ public class CallableSubmitExample {
 			});
 
 			try {
+				//스레드 작업 완료 후 후 처리 하는 부분 
 				int result = future.get();
 				System.out.println("\t리턴값: " + result);
 			} catch (Exception e) {

@@ -79,7 +79,13 @@ public class FilteringExample {
 			System.out.println(str);
 		}
 		System.out.println();
+		list.stream()
+			.filter(str -> str.startsWith("신"))
+			.forEach(str -> System.out.println(str));
 		
+		list.stream()
+		.filter(str -> str.startsWith("신"))
+		.forEach(System.out::println);
 		
 		//신으로 시작하는 요소만 필터링
 //		list.stream()
