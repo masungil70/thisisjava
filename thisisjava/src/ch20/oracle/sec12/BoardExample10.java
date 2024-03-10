@@ -1,5 +1,10 @@
 package ch20.oracle.sec12;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +19,8 @@ public class BoardExample10 {
 	//할일 : 게시물 정보를 저장 할 수 있는 배열을 선언한다 
 	//List<Board> boardList = new ArrayList<Board>();
 	//set/map 으로 변경
-	Set<Board> boardSet = new HashSet<Board>();
-	Map<Integer, Board> boardMap = new HashMap<Integer, Board>();
+	//Set<Board> boardSet = new HashSet<Board>();
+	//Map<Integer, Board> boardMap = new HashMap<Integer, Board>();
 	
 	//Constructor
 	
@@ -26,21 +31,56 @@ public class BoardExample10 {
 		System.out.println("-----------------------------------------------------------------------");
 		System.out.printf("%-6s%-12s%-16s%-40s\n", "no", "writer", "date", "title");
 		System.out.println("-----------------------------------------------------------------------");
-//		System.out.printf("%-6s%-12s%-16s%-40s \n", 
-//				"1", "winter", "2024.01.27", "게시판에 오신 것을 환영합니다.");
-//		System.out.printf("%-6s%-12s%-16s%-40s \n", 
-//				"2", "winter", "2024.01.27", "올 겨울은 많이 춥습니다.");
+		// 아래 구문이 동작할 수 있게 기능 추가 
+		// select * from boards
 		
-		//할일 : 배열에 저장된 것을 출력할 수 있게 기능 추가한다 
-		for (Board board : boardSet) {
-		//for (Board board : boardList) {
-//			System.out.printf("%-6s%-12s%-16s%-40s \n"
-//					, board.getBno()
-//					, board.getBtitle()
-//					, board.getBdate()
-//					, board.getBcontent());
-			board.print();
-		}
+		Connection conn = null;
+		try {
+			//JDBC Driver 등록
+			Class.forName("oracle.jdbc.OracleDriver");
+
+			//연결하기
+			conn = DriverManager.getConnection(
+					"jdbc:oracle:thin:@localhost:1521/xe",
+					"bituser", //계정이름 
+					"1004" //계정비밀번호
+					);
+			
+			System.out.println("연결 성공");
+			
+			PreparedStatement pstmt = conn.prepareStatement("select * from boards");
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				//찾고자 하는 자료가 있음 
+				String bno = rs.getString("bno");
+				String btitle = rs.getString("btitle");
+				String bcontent = rs.getString("bcontent");
+				String bwriter = rs.getString("bwriter");
+				String bdate = rs.getString("bdate");
+				
+				System.out.println("bno : " + bno);
+				System.out.println("btitle : " + btitle);
+				System.out.println("bcontent : " + bcontent);
+				System.out.println("bwriter : " + bwriter);
+				System.out.println("bdate : " + bdate);
+				System.out.println("====================\n");
+			} 
+			rs.close();
+			pstmt.close();
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(conn != null) {
+				try {
+					//연결 끊기
+					conn.close();
+					System.out.println("연결 끊기");
+				} catch (SQLException e) {}
+			}
+		}	
 		mainMenu();
 	}
 	
@@ -78,11 +118,19 @@ public class BoardExample10 {
 		System.out.print("메뉴 선택: ");
 		String menuNo = scanner.nextLine();
 		if(menuNo.equals("1")) {
-			//할일 : 입력된 정보를 기준으로 객체를 생성하여 배열에 저장 하는 기능을 구현한다 
-			//boardList.add(new Board(title, content, writer));
-			Board board = new Board(title, content, writer);
-			boardSet.add(board);
-			boardMap.put(board.getBno(), board);
+			//할일 : 입력된 정보를 기준으로 객체를 생성하여 배열에 저장 하는 기능을 구현한다
+			// boardList.add(new Board(title, content, writer));
+			
+			// 아래 구문이 동작할 수 있게 기능 추가 
+			//  insert into boards (
+			//    bno, btitle, bcontent, bwriter, bdate
+			//  ) values (
+			//    seq_bno.nextval, ?, ?, ?, sysdate
+			//  ) 
+			
+//			Board board = new Board(title, content, writer);
+//			boardSet.add(board);
+//			boardMap.put(board.getBno(), board);
 		}
 		
 		//게시물 목록 출력
@@ -95,36 +143,31 @@ public class BoardExample10 {
 		//게시물 번호 입력 
 		int bno = Integer.parseInt(scanner.nextLine());
 		
-		//할일 : 입력된 게시물 번호를 이용하여 게시물 목록에서 자료를 찾아 출력한다
-		Board findBoard = boardMap.get(bno);
-//		for (Board board : boardList) {
-//			if (board.getBno() == bno) {
-//				findBoard = board;
-//				break;
-//			}
-//		}
+		// 아래 구문이 동작할 수 있게 기능 추가 
+		//select * from boards where bno = ?
 		
-		if (findBoard != null) {
+		
+//		if (findBoard != null) {
 //			System.out.printf("%-6s%-12s%-16s%-40s \n"
 //			, board.getBno()
 //			, board.getBtitle()
 //			, board.getBdate()
 //			, board.getBcontent());
-			findBoard.printDetail();
+//			findBoard.printDetail();
 	
-			//보조 메뉴 출력
-			System.out.println("-------------------------------------------------------------------");
-			System.out.println("보조 메뉴: 1.Update | 2.Delete | 3.List");
-			System.out.print("메뉴 선택: ");
-			String menuNo = scanner.nextLine();
-			System.out.println();
-			
-			switch(menuNo) {
-			case "1" -> update(findBoard);
-			case "2" -> delete(findBoard);
-			case "3" -> list(); 
-			}
-		}
+//			//보조 메뉴 출력
+//			System.out.println("-------------------------------------------------------------------");
+//			System.out.println("보조 메뉴: 1.Update | 2.Delete | 3.List");
+//			System.out.print("메뉴 선택: ");
+//			String menuNo = scanner.nextLine();
+//			System.out.println();
+//			
+//			switch(menuNo) {
+////			case "1" -> update(findBoard);
+////			case "2" -> delete(findBoard);
+//			case "3" -> list(); 
+//			}
+//		}
 	}
 	
 	public void update(Board board) {
@@ -145,22 +188,28 @@ public class BoardExample10 {
 		System.out.println("보조 메뉴: 1.Ok | 2.Cancel");
 		System.out.print("메뉴 선택: ");
 		String menuNo = scanner.nextLine();
+		// 아래 구문이 동작할 수 있게 기능 추가 
+		// update 구문 완성해서 구현 해주세요
+		
 		//할일 : 입력된 정보를 기준으로 게시물 정보 수정한다
-		if ("1".equals(menuNo)) {
-			board.setBtitle(title);
-			board.setBcontent(content);
-			board.setBwriter(writer);
-		}
+//		if ("1".equals(menuNo)) {
+//			board.setBtitle(title);
+//			board.setBcontent(content);
+//			board.setBwriter(writer);
+//		}
 		
 		//게시물 목록 출력
 		list();
 	}
 	
 	public void delete(Board board) {
+		// 아래 구문이 동작할 수 있게 기능 추가 
+		// delete 구문 완성해서 구현 해주세요 
+
 		//할일 : 게시물 정보 삭제
 		//boardList.remove(board);
-		boardSet.remove(board);
-		boardMap.remove(board.getBno());
+		//boardSet.remove(board);
+		//boardMap.remove(board.getBno());
 		
 		//게시물 목록 출력		
 		list();
@@ -168,10 +217,13 @@ public class BoardExample10 {
 		
 	public void clear() {
 		System.out.println("[게시물 전체 삭제]");
+		// 아래 구문이 동작할 수 있게 기능 추가 
+		// delete 구문 완성해서 구현 해주세요 
+
 		//할일 : 게시물 전체 삭제 기능 구현
 		//boardList.clear();
-		boardSet.clear();
-		boardMap.clear();
+		//boardSet.clear();
+		//boardMap.clear();
 		
 		//게시물 목록 출력
 		list();
@@ -186,3 +238,14 @@ public class BoardExample10 {
 		boardExample.list();
 	}
 }
+
+
+/*
+트렌젝션 동작 할 수 있게 추가 할 것
+
+setAutoCommit(false);
+
+insert, delete, update 구문 실 행 후 commit() 실행 할 것 
+  
+*/ 
+
