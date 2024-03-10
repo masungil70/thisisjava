@@ -118,8 +118,6 @@ public class BoardExample10 {
 		System.out.print("메뉴 선택: ");
 		String menuNo = scanner.nextLine();
 		if(menuNo.equals("1")) {
-			//할일 : 입력된 정보를 기준으로 객체를 생성하여 배열에 저장 하는 기능을 구현한다
-			// boardList.add(new Board(title, content, writer));
 			
 			// 아래 구문이 동작할 수 있게 기능 추가 
 			//  insert into boards (
@@ -127,10 +125,48 @@ public class BoardExample10 {
 			//  ) values (
 			//    seq_bno.nextval, ?, ?, ?, sysdate
 			//  ) 
-			
-//			Board board = new Board(title, content, writer);
-//			boardSet.add(board);
-//			boardMap.put(board.getBno(), board);
+
+			Connection conn = null;
+			try {
+				//JDBC Driver 등록
+				Class.forName("oracle.jdbc.OracleDriver");
+
+				//연결하기
+				conn = DriverManager.getConnection(
+						"jdbc:oracle:thin:@localhost:1521/xe",
+						"bituser", //계정이름 
+						"1004" //계정비밀번호
+						);
+				
+				System.out.println("연결 성공");
+				
+				PreparedStatement pstmt = conn.prepareStatement("insert into boards (bno, btitle, bcontent, bwriter, bdate) values (seq_bno.nextval, ?, ?, ?, sysdate)");
+		
+				//입력 값을 설정 한다
+				pstmt.setString(1, title);
+				pstmt.setString(2, content);
+				pstmt.setString(3, writer);
+					
+				int updated = pstmt.executeUpdate();
+				//변경된 건 수 
+				System.out.println("변경 건수  : " + updated);
+				
+				pstmt.close();
+				
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if(conn != null) {
+					try {
+						//연결 끊기
+						conn.close();
+						System.out.println("연결 끊기");
+					} catch (SQLException e) {}
+				}
+			}
+
 		}
 		
 		//게시물 목록 출력
