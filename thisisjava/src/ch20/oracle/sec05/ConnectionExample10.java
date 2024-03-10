@@ -31,7 +31,7 @@ public class ConnectionExample10 {
 			
 			System.out.println("연결 성공");
 			
-			CallableStatement cstmt = conn.prepareCall("{ call USERS_CREATE(?,?,?,?,?, ?)");
+			CallableStatement cstmt = conn.prepareCall("{ call USERS_CREATE(?,?,?,?,?, ?) }");
 			Scanner scanner = new Scanner(System.in);
 			while(true) {
 				System.out.print("아이디 입력 : ");
