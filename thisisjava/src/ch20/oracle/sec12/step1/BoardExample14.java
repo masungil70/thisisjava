@@ -97,38 +97,10 @@ public class BoardExample14 {
 		// 아래 구문이 동작할 수 있게 기능 추가
 		// select * from boards where bno = ?
 
-		try {
-			// 입력 값을 설정 한다
-			boardDetailPstmt.setInt(1, bno);
-
-			ResultSet rs = boardDetailPstmt.executeQuery();
-			if (rs.next()) {
-				// 찾고자 하는 자료가 있음
-				bno = rs.getInt(1);
-				String btitle = rs.getString(2);
-				String bcontent = rs.getString(3);
-				String bwriter = rs.getString(4);
-				String bdate = rs.getString(5);
-
-				System.out.println("bno : " + bno);
-				System.out.println("btitle : " + btitle);
-				System.out.println("bcontent : " + bcontent);
-				System.out.println("bwriter : " + bwriter);
-				System.out.println("bdate : " + bdate);
-				System.out.println("====================\n");
-
-			} else {
-				// 찾고자 하는 자료가 없음
-				System.out.println("[" + bno + "] 에 대한 자료가 존재하지않습니다 ");
-				bno = -1;
-			}
-			rs.close();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		if (bno != -1) {
+		Board board = boardDAO.read(bno);
+		if (board != null) {
+			board.printDetail();
+			
 			// 보조 메뉴 출력
 			System.out.println("-------------------------------------------------------------------");
 			System.out.println("보조 메뉴: 1.Update | 2.Delete | 3.List");
@@ -141,6 +113,10 @@ public class BoardExample14 {
 			case "2" -> delete(bno);
 			case "3" -> list();
 			}
+		} else {
+			// 찾고자 하는 자료가 없음
+			System.out.println("[" + bno + "] 에 대한 자료가 존재하지않습니다 ");
+			bno = -1;
 		}
 
 	}
@@ -173,19 +149,10 @@ public class BoardExample14 {
 	public void delete(int bno) {
 		// 아래 구문이 동작할 수 있게 기능 추가
 		// delete 구문 완성해서 구현 해주세요
-		try {
-			// 입력 값을 설정 한다
-			boardDeletePstmt.setInt(1, bno);
+		int updated = boardDAO.delete(bno);
 
-			int updated = boardDeletePstmt.executeUpdate();
-			conn.commit();
-
-			// 변경된 건 수
-			System.out.println("삭제 건수  : " + updated);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// 변경된 건 수
+		System.out.println("삭제 건수  : " + updated);
 
 		// 게시물 목록 출력
 		list();
@@ -195,16 +162,11 @@ public class BoardExample14 {
 		System.out.println("[게시물 전체 삭제]");
 		// 아래 구문이 동작할 수 있게 기능 추가
 		// delete 구문 완성해서 구현 해주세요
-		try {
-			int updated = boardDeleteAllPstmt.executeUpdate();
-			conn.commit();
+		int updated = boardDAO.clear();
 
-			// 변경된 건 수
-			System.out.println("삭제 건수  : " + updated);
+		// 변경된 건 수
+		System.out.println("삭제 건수  : " + updated);
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		// 게시물 목록 출력
 		list();
 	}
@@ -224,7 +186,7 @@ public class BoardExample14 {
 	}
 
 	public static void main(String[] args) {
-		BoardExample14 boardExample = new BoardExample14();
+		BoardExample14 boardExample = new BoardExample14(new BoardDAO());
 		boardExample.list();
 	}
 }
