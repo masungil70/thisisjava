@@ -12,6 +12,10 @@ public class BoardExample13 {
 	private Scanner scanner = new Scanner(System.in);
 	private static Connection conn = null;
 	private static PreparedStatement boardListPstmt = null;
+	private static PreparedStatement boardInsertPstmt = null;
+	private static PreparedStatement boardDetailPstmt = null;
+	private static PreparedStatement boardDeletePstmt = null;
+	private static PreparedStatement boardDeleteAllPstmt = null;
 
 	static {
 		try {
@@ -28,7 +32,10 @@ public class BoardExample13 {
 			System.out.println("연결 성공");
 			
 			boardListPstmt = conn.prepareStatement("select * from boards");
-			
+			boardInsertPstmt = conn.prepareStatement("insert into boards (bno, btitle, bcontent, bwriter, bdate) values (seq_bno.nextval, ?, ?, ?, sysdate)");
+			boardDetailPstmt = conn.prepareStatement("select * from boards where bno=?");
+			boardDeletePstmt = conn.prepareStatement("delete from boards where bno=?");
+			boardDeleteAllPstmt = conn.prepareStatement("delete from boards");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -127,19 +134,15 @@ public class BoardExample13 {
 			// )
 
 			try {
-				PreparedStatement pstmt = conn.prepareStatement(
-						"insert into boards (bno, btitle, bcontent, bwriter, bdate) values (seq_bno.nextval, ?, ?, ?, sysdate)");
-
 				// 입력 값을 설정 한다
-				pstmt.setString(1, title);
-				pstmt.setString(2, content);
-				pstmt.setString(3, writer);
+				boardInsertPstmt.setString(1, title);
+				boardInsertPstmt.setString(2, content);
+				boardInsertPstmt.setString(3, writer);
 
-				int updated = pstmt.executeUpdate();
+				int updated = boardInsertPstmt.executeUpdate();
+				conn.commit();
 				// 변경된 건 수
 				System.out.println("변경 건수  : " + updated);
-
-				pstmt.close();
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -160,12 +163,10 @@ public class BoardExample13 {
 		// select * from boards where bno = ?
 
 		try {
-			PreparedStatement pstmt = conn.prepareStatement("select * from boards where bno=?");
-
 			// 입력 값을 설정 한다
-			pstmt.setInt(1, bno);
+			boardDetailPstmt.setInt(1, bno);
 
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs = boardDetailPstmt.executeQuery();
 			if (rs.next()) {
 				// 찾고자 하는 자료가 있음
 				bno = rs.getInt(1);
@@ -187,7 +188,6 @@ public class BoardExample13 {
 				bno = -1;
 			}
 			rs.close();
-			pstmt.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -239,14 +239,12 @@ public class BoardExample13 {
 		// 아래 구문이 동작할 수 있게 기능 추가
 		// delete 구문 완성해서 구현 해주세요
 		try {
-			PreparedStatement pstmt = conn.prepareStatement("delete from boards where bno=?");
-
 			// 입력 값을 설정 한다
-			pstmt.setInt(1, bno);
+			boardDeletePstmt.setInt(1, bno);
 
-			int updated = pstmt.executeUpdate();
+			int updated = boardDeletePstmt.executeUpdate();
+			conn.commit();
 
-			pstmt.close();
 			// 변경된 건 수
 			System.out.println("삭제 건수  : " + updated);
 
@@ -263,11 +261,9 @@ public class BoardExample13 {
 		// 아래 구문이 동작할 수 있게 기능 추가
 		// delete 구문 완성해서 구현 해주세요
 		try {
-			PreparedStatement pstmt = conn.prepareStatement("delete from boards");
+			int updated = boardDeleteAllPstmt.executeUpdate();
+			conn.commit();
 
-			int updated = pstmt.executeUpdate();
-
-			pstmt.close();
 			// 변경된 건 수
 			System.out.println("삭제 건수  : " + updated);
 
