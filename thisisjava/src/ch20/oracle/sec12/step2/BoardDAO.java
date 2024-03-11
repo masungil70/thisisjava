@@ -17,6 +17,7 @@ public class BoardDAO {
 	private static Connection conn = null;
 	private static PreparedStatement boardListPstmt = null;
 	private static PreparedStatement boardInsertPstmt = null;
+	private static PreparedStatement boardUpdatePstmt = null;
 	private static PreparedStatement boardDetailPstmt = null;
 	private static PreparedStatement boardDeletePstmt = null;
 	private static PreparedStatement boardDeleteAllPstmt = null;
@@ -39,6 +40,7 @@ public class BoardDAO {
 			
 			boardListPstmt = conn.prepareStatement("select bno, btitle, bcontent, bwriter, to_char(bdate, 'YYYY-MM-DD') bdate from boards");
 			boardInsertPstmt = conn.prepareStatement("insert into boards (bno, btitle, bcontent, bwriter, bdate) values (seq_bno.nextval, ?, ?, ?, sysdate)");
+			boardUpdatePstmt = conn.prepareStatement("update boards set btitle=?, bcontent=?, bwriter=? where bno=?");
 			boardDetailPstmt = conn.prepareStatement("select * from boards where bno=?");
 			boardDeletePstmt = conn.prepareStatement("delete from boards where bno=?");
 			boardDeleteAllPstmt = conn.prepareStatement("delete from boards");
@@ -119,15 +121,20 @@ public class BoardDAO {
 	public int update(Board board) {
 		try {
 			// 입력 값을 설정 한다
-			boardDetailPstmt.setString(1, board.getBtitle());
-			boardDetailPstmt.setString(2, board.getBcontent());
-			boardDetailPstmt.setString(3, board.getBwriter());
-			boardDetailPstmt.setInt(4, board.getBno());
+			boardUpdatePstmt.setString(1, board.getBtitle());
+			boardUpdatePstmt.setString(2, board.getBcontent());
+			boardUpdatePstmt.setString(3, board.getBwriter());
+			boardUpdatePstmt.setInt(4, board.getBno());
 
-			return boardDetailPstmt.executeUpdate();
+			int updated = boardDetailPstmt.executeUpdate();
+			conn.commit();
+			
+			return updated;
+			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} 
 		return 0;
 	}
 
