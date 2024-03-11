@@ -126,7 +126,7 @@ public class BoardDAO {
 			boardUpdatePstmt.setString(3, board.getBwriter());
 			boardUpdatePstmt.setInt(4, board.getBno());
 
-			int updated = boardDetailPstmt.executeUpdate();
+			int updated = boardUpdatePstmt.executeUpdate();
 			conn.commit();
 			
 			return updated;
