@@ -35,7 +35,9 @@ public class BoardDAO {
 			
 			System.out.println("연결 성공");
 			
-			boardListPstmt = conn.prepareStatement("select * from boards");
+			conn.setAutoCommit(false);
+			
+			boardListPstmt = conn.prepareStatement("select bno, btitle, bcontent, bwriter, to_char(bdate, 'YYYY-MM-DD') bdate from boards");
 			boardInsertPstmt = conn.prepareStatement("insert into boards (bno, btitle, bcontent, bwriter, bdate) values (seq_bno.nextval, ?, ?, ?, sysdate)");
 			boardDetailPstmt = conn.prepareStatement("select * from boards where bno=?");
 			boardDeletePstmt = conn.prepareStatement("delete from boards where bno=?");
